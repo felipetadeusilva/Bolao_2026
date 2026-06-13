@@ -153,10 +153,6 @@ def update_html(resultados):
     with open(HTML_FILE, "r", encoding="utf-8") as f:
         html = f.read()
 
-    if not resultados:
-        print("Nenhum resultado FINISHED encontrado. Nada a atualizar.")
-        return False
-
     # Merge with existing results (in case API misses an older game)
     m = re.search(r'const RESULTADOS_OFICIAIS=(\{.*?\});', html)
     existing = json.loads(m.group(1)) if m else {}
@@ -166,17 +162,17 @@ def update_html(resultados):
     merged_sorted = {k: merged[k] for k in sorted(merged, key=lambda x: int(x))}
     new_json = json.dumps(merged_sorted, ensure_ascii=False, separators=(",", ":"))
 
-    if merged_sorted == existing:
-        print("Sem novos resultados desde a última atualização.")
-        return False
+    results_changed = merged_sorted != existing
 
-    html = re.sub(
-        r'const RESULTADOS_OFICIAIS=\{.*?\};',
-        f'const RESULTADOS_OFICIAIS={new_json};',
-        html
-    )
+    if results_changed:
+        html = re.sub(
+            r'const RESULTADOS_OFICIAIS=\{.*?\};',
+            f'const RESULTADOS_OFICIAIS={new_json};',
+            html
+        )
 
-    # Update timestamp (Sao Paulo time, UTC-3)
+    # Sempre atualiza o timestamp (reflete a última vez que o robô checou),
+    # mesmo que não haja resultado novo.
     sp_time = datetime.now(timezone.utc) - timedelta(hours=3)
     ts = sp_time.strftime("%d/%m/%Y %H:%M")
     html = re.sub(
@@ -188,7 +184,10 @@ def update_html(resultados):
     with open(HTML_FILE, "w", encoding="utf-8") as f:
         f.write(html)
 
-    print(f"✅ Atualizado: {len(merged_sorted)} resultados | timestamp {ts}")
+    if results_changed:
+        print(f"✅ Atualizado: {len(merged_sorted)} resultados | timestamp {ts}")
+    else:
+        print(f"ℹ️  Sem novos resultados. Timestamp atualizado para {ts}")
     return True
 
 
