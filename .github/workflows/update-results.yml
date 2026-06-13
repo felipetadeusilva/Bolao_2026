@@ -1,0 +1,39 @@
+name: Atualizar resultados Bolão Copa 2026
+
+on:
+  schedule:
+    # Roda a cada 1 hora (UTC). Ajuste conforme necessário.
+    - cron: '0 * * * *'
+  workflow_dispatch: {}  # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Buscar resultados e atualizar index.html
+        env:
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+        run: python update_results.py
+
+      - name: Commit e push se houver mudanças
+        run: |
+          git config user.name "bolao-bot"
+          git config user.email "bot@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "Nenhuma mudança para commitar."
+          else
+            git add index.html
+            git commit -m "Atualização automática de resultados $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
