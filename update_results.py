@@ -40,6 +40,9 @@ TEAM_NAME_MAP = {
     "Turkey": "TURQUIA",
     "Germany": "ALEMANHA",
     "Curacao": "CURAÇAU",
+    "Curaçao": "CURAÇAU",
+    "Curação": "CURAÇAU",
+    "CURAçAO": "CURAÇAU",
     "Netherlands": "HOLANDA",
     "Japan": "JAPÃO",
     "Ivory Coast": "COSTA DO MARFIM",
@@ -142,7 +145,7 @@ def build_resultados(matches):
                 num = num_rev
                 ha, aa = aa, ha
             else:
-                print(f"⚠️  Jogo não mapeado: {home} x {away}", file=sys.stderr)
+                print(f"⚠️  Jogo não mapeado: [{repr(home)}] x [{repr(away)}] (API original: [{repr(m["homeTeam"]["name"])}] x [{repr(m["awayTeam"]["name"])}])")
                 continue
 
         resultados[str(num)] = {"a": ha, "b": aa}
