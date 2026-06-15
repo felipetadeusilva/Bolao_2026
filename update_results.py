@@ -22,6 +22,10 @@ HTML_FILE = "index.html"
 # A API retorna nomes em inglês; o HTML usa nomes em português (maiúsculas,
 # acentuados, conforme a tabela original da planilha).
 TEAM_NAME_MAP = {
+    "South Korea": "REP. CORÉIA",
+    "Czechia": "REP. TCHECA",
+    "Bosnia-Herzegovina": "BÓSNIA",
+    "Cape Verde Islands": "CABO VERDE",
     "Mexico": "MÉXICO",
     "South Africa": "ÁFRICA DO SUL",
     "Korea Republic": "REP. CORÉIA",
