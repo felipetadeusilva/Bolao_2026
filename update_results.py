@@ -22,10 +22,6 @@ HTML_FILE = "index.html"
 # A API retorna nomes em inglês; o HTML usa nomes em português (maiúsculas,
 # acentuados, conforme a tabela original da planilha).
 TEAM_NAME_MAP = {
-    "South Korea": "REP. CORÉIA",
-    "Czechia": "REP. TCHECA",
-    "Bosnia-Herzegovina": "BÓSNIA",
-    "Cape Verde Islands": "CABO VERDE",
     "Mexico": "MÉXICO",
     "South Africa": "ÁFRICA DO SUL",
     "Korea Republic": "REP. CORÉIA",
@@ -44,9 +40,6 @@ TEAM_NAME_MAP = {
     "Turkey": "TURQUIA",
     "Germany": "ALEMANHA",
     "Curacao": "CURAÇAU",
-    "Curaçao": "CURAÇAU",
-    "Curação": "CURAÇAU",
-    "CURAçAO": "CURAÇAU",
     "Netherlands": "HOLANDA",
     "Japan": "JAPÃO",
     "Ivory Coast": "COSTA DO MARFIM",
@@ -72,6 +65,7 @@ TEAM_NAME_MAP = {
     "Jordan": "JORDÂNIA",
     "Portugal": "PORTUGAL",
     "DR Congo": "REP. D. CONGO",
+    "Congo DR": "REP. D. CONGO",
     "England": "INGLATERRA",
     "Croatia": "CROÁCIA",
     "Ghana": "GANA",
@@ -149,7 +143,7 @@ def build_resultados(matches):
                 num = num_rev
                 ha, aa = aa, ha
             else:
-                print(f"⚠️  Jogo não mapeado: [{repr(home)}] x [{repr(away)}] (API original: [{repr(m["homeTeam"]["name"])}] x [{repr(m["awayTeam"]["name"])}])")
+                print(f"⚠️  Jogo não mapeado: {home} x {away}", file=sys.stderr)
                 continue
 
         resultados[str(num)] = {"a": ha, "b": aa}
