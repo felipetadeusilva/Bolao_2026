@@ -129,6 +129,23 @@ def fetch_matches(token):
 
 def build_resultados(matches):
     """Build {jogo_num: {a: score, b: score}} dict from FINISHED matches."""
+    # Debug: imprime todos os jogos finalizados com placar e status de mapeamento
+    finished = [m for m in matches if m.get("status") == "FINISHED"]
+    print(f"🔍 Jogos finalizados pela API ({len(finished)}):")
+    for m in finished:
+        home_api = m["homeTeam"]["name"]
+        away_api = m["awayTeam"]["name"]
+        home = map_team(home_api)
+        away = map_team(away_api)
+        score = m.get("score", {}).get("fullTime", {})
+        ha, aa = score.get("home", "?"), score.get("away", "?")
+
+        num = JOGOS_IDX.get((home, away)) or JOGOS_IDX.get((away, home))
+        if num:
+            print(f"   ✅  {home_api} {ha} x {aa} {away_api}  ->  Jogo #{num}")
+        else:
+            print(f"   ⚠️  {home_api} {ha} x {aa} {away_api}  ->  SEM MAPEAMENTO ('{home}' x '{away}')")
+
     resultados = {}
     for m in matches:
         if m.get("status") != "FINISHED":
