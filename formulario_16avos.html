@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão do Ronaldão — 16 Avos 2026</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --border: rgba(255,255,255,0.08);
+    --gold: #f5a623;
+    --gold2: #ffd700;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --r: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding: 0 0 60px; }
+
+  /* HEADER */
+  header { background: linear-gradient(135deg, #0f1729 0%, #1a0a2e 100%); border-bottom: 1px solid rgba(245,166,35,0.2); padding: 20px 16px 16px; text-align: center; position: relative; }
+  header h1 { font-size: 1.35rem; font-weight: 800; color: var(--gold2); letter-spacing: -0.02em; }
+  header p { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+  .phase-badge { display: inline-block; background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3); color: var(--gold); font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* DEADLINE BANNER */
+  #deadline-banner { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); border-radius: var(--r); margin: 14px 14px 0; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+  #deadline-banner .icon { font-size: 1.2rem; flex-shrink: 0; }
+  #deadline-banner .txt { font-size: 0.76rem; color: #fca5a5; line-height: 1.4; }
+  #deadline-banner .txt b { color: var(--red); }
+  #countdown { font-size: 0.95rem; font-weight: 800; color: var(--red); font-variant-numeric: tabular-nums; }
+
+  /* FORM CONTAINER */
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 14px; }
+
+  /* NOME */
+  .nome-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; margin-top: 14px; }
+  .nome-section label { font-size: 0.72rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px; }
+  .nome-section input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-size: 0.95rem; padding: 10px 12px; outline: none; transition: border-color .2s; }
+  .nome-section input:focus { border-color: rgba(245,166,35,0.5); }
+  .nome-section input::placeholder { color: var(--muted); }
+
+  /* JOGOS */
+  .jogos-section { margin-top: 10px; }
+  .day-group { margin-bottom: 6px; }
+  .day-label { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 2px 4px; }
+
+  .jogo-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; margin-bottom: 6px; transition: border-color .2s; }
+  .jogo-card:focus-within { border-color: rgba(245,166,35,0.3); }
+  .jogo-card.tbd { opacity: 0.55; pointer-events: none; }
+  .jogo-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .jogo-num { font-size: 0.63rem; font-weight: 700; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 7px; border-radius: 4px; }
+  .jogo-hora { font-size: 0.68rem; color: var(--muted); }
+  .jogo-cidade { font-size: 0.63rem; color: var(--muted); opacity: 0.7; }
+  .tbd-badge { font-size: 0.62rem; font-weight: 700; color: var(--muted); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.04em; }
+
+  .placar-row { display: grid; grid-template-columns: 1fr 52px 52px 1fr; align-items: center; gap: 8px; }
+  .time-nome { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .time-nome.home { text-align: right; }
+  .time-nome.away { text-align: left; }
+  .gol-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-size: 1.1rem; font-weight: 700; text-align: center; padding: 8px 4px; outline: none; transition: all .2s; appearance: textfield; -moz-appearance: textfield; }
+  .gol-input::-webkit-inner-spin-button, .gol-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .gol-input:focus { border-color: var(--gold); background: rgba(245,166,35,0.08); }
+  .gol-input.filled { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+
+  /* SUBMIT */
+  .submit-area { margin-top: 20px; }
+  #btn-submit { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; border-radius: var(--r); font-size: 1rem; font-weight: 800; cursor: pointer; letter-spacing: 0.01em; transition: all .2s; }
+  #btn-submit:hover:not(:disabled) { background: var(--gold2); transform: translateY(-1px); }
+  #btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .progress-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width .3s; }
+  .progress-lbl { font-size: 0.68rem; color: var(--muted); text-align: center; margin-top: 6px; }
+
+  /* SUCCESS / ERROR */
+  #msg { display: none; border-radius: var(--r); padding: 16px; margin-top: 14px; font-size: 0.85rem; line-height: 1.5; text-align: center; }
+  #msg.ok { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+  #msg.err { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+
+  /* CLOSED */
+  #closed-screen { display: none; text-align: center; padding: 40px 20px; }
+  #closed-screen .icon { font-size: 3rem; margin-bottom: 12px; }
+  #closed-screen h2 { color: var(--red); font-size: 1.1rem; margin-bottom: 8px; }
+  #closed-screen p { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+
+  @media (max-width: 400px) {
+    .placar-row { grid-template-columns: 1fr 44px 44px 1fr; gap: 5px; }
+    .time-nome { font-size: 0.74rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 Bolão do Ronaldão</h1>
+  <p>Copa do Mundo 2026</p>
+  <div class="phase-badge">⚔️ 16 Avos de Final</div>
+</header>
+
+<div class="wrap">
+
+  <!-- DEADLINE -->
+  <div id="deadline-banner">
+    <div class="icon">⏰</div>
+    <div class="txt">
+      Palpites encerram no início do 1º jogo<br>
+      <b>Domingo, 28/jun às 16h00 (Brasília)</b><br>
+      Tempo restante: <span id="countdown">--:--:--</span>
+    </div>
+  </div>
+
+  <div id="form-area">
+    <!-- NOME -->
+    <div class="nome-section">
+      <label for="nome">Seu nome completo</label>
+      <input type="text" id="nome" placeholder="Ex: Felipe Adrião" autocomplete="name" maxlength="60">
+    </div>
+
+    <!-- JOGOS -->
+    <div class="jogos-section" id="jogos-container"></div>
+
+    <!-- PROGRESS + SUBMIT -->
+    <div class="submit-area">
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="progress-lbl" id="prog-lbl">Preencha os jogos confirmados para enviar</div>
+      <br>
+      <button id="btn-submit" disabled onclick="enviar()">Enviar meus palpites</button>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+
+  <div id="closed-screen">
+    <div class="icon">🔒</div>
+    <h2>Palpites encerrados</h2>
+    <p>O prazo para envio expirou com o início do primeiro jogo.<br>Acompanhe o ranking ao vivo no link enviado no grupo!</p>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// CONFIGURAÇÃO — preencha antes de publicar
+// ════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ycwdtdsvwhdjqjthlkfx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_qBK2kKwx4ea3JEeTQrUmgg_7vOoQx1S';
+
+// Data/hora de encerramento: 28/jun/2026 16:00 horário de Brasília (UTC-3)
+const DEADLINE = new Date('2026-06-28T19:00:00Z');
+
+// ════════════════════════════════════════════════
+// JOGOS — 16 AVOS DE FINAL
+// tbd: true = adversário ainda não definido (só exibe, não aceita palpite)
+// ════════════════════════════════════════════════
+const JOGOS = [
+  // DOM 28/JUN
+  { num:1,  data:'28/06', hora:'16h00', local:'Los Angeles',      a:'África do Sul', b:'Canadá',         tbd:false },
+  // SEG 29/JUN
+  { num:2,  data:'29/06', hora:'14h00', local:'Houston',          a:'Brasil',        b:'Japão',           tbd:false },
+  { num:3,  data:'29/06', hora:'17h30', local:'Boston',           a:'Alemanha',      b:'A definir',       tbd:true  },
+  { num:4,  data:'29/06', hora:'22h00', local:'Monterrey',        a:'Holanda',       b:'Marrocos',        tbd:false },
+  // TER 30/JUN
+  { num:5,  data:'30/06', hora:'14h00', local:'Dallas',           a:'Costa do Marfim', b:'Noruega',       tbd:false },
+  { num:6,  data:'30/06', hora:'18h00', local:'Nova York/NJ',     a:'França',        b:'A definir',       tbd:true  },
+  { num:7,  data:'30/06', hora:'22h00', local:'Cidade do México', a:'México',        b:'A definir',       tbd:true  },
+  // QUA 01/JUL
+  { num:8,  data:'01/07', hora:'13h00', local:'Atlanta',          a:'A definir',     b:'A definir',       tbd:true  },
+  { num:9,  data:'01/07', hora:'17h00', local:'Seattle',          a:'A definir',     b:'A definir',       tbd:true  },
+  { num:10, data:'01/07', hora:'21h00', local:'Santa Clara',      a:'Estados Unidos',b:'Bósnia',          tbd:false },
+  { num:11, data:'01/07', hora:'22h00', local:'Filadélfia',       a:'Espanha',       b:'A definir',       tbd:true  },
+  // QUI 02/JUL
+  { num:12, data:'02/07', hora:'14h00', local:'Miami',            a:'Argentina',     b:'A definir',       tbd:true  },
+  { num:13, data:'02/07', hora:'22h30', local:'Kansas City',      a:'A definir',     b:'A definir',       tbd:true  },
+  // SEX 03/JUL
+  { num:14, data:'03/07', hora:'00h00', local:'Vancouver',        a:'Suíça',         b:'A definir',       tbd:true  },
+  { num:15, data:'03/07', hora:'15h00', local:'Dallas',           a:'Austrália',     b:'A definir',       tbd:true  },
+  { num:16, data:'03/07', hora:'19h00', local:'Miami',            a:'A definir',     b:'A definir',       tbd:true  },
+];
+
+// ════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════
+const palpites = {}; // num -> {a, b}
+
+function renderJogos() {
+  const container = document.getElementById('jogos-container');
+  let currentDay = '';
+  let html = '';
+  JOGOS.forEach(j => {
+    if (j.data !== currentDay) {
+      if (currentDay) html += '</div>';
+      currentDay = j.data;
+      const dias = {'28/06':'Domingo, 28 de junho','29/06':'Segunda-feira, 29 de junho',
+        '30/06':'Terça-feira, 30 de junho','01/07':'Quarta-feira, 1º de julho',
+        '02/07':'Quinta-feira, 2 de julho','03/07':'Sexta-feira, 3 de julho'};
+      html += `<div class="day-group"><div class="day-label">${dias[j.data]||j.data}</div>`;
+    }
+    const tbd = j.tbd;
+    html += `
+    <div class="jogo-card${tbd?' tbd':''}" id="card-${j.num}">
+      <div class="jogo-meta">
+        <span class="jogo-num">Jogo ${j.num}</span>
+        <span class="jogo-hora">${j.hora}</span>
+        <span class="jogo-cidade">${j.local}</span>
+        ${tbd ? '<span class="tbd-badge">A DEFINIR</span>' : ''}
+      </div>
+      <div class="placar-row">
+        <div class="time-nome home">${j.a}</div>
+        <input class="gol-input" id="ga-${j.num}" type="number" min="0" max="20" placeholder="?" ${tbd?'disabled':''} oninput="onInput(${j.num},'a',this.value)" inputmode="numeric">
+        <input class="gol-input" id="gb-${j.num}" type="number" min="0" max="20" placeholder="?" ${tbd?'disabled':''} oninput="onInput(${j.num},'b',this.value)" inputmode="numeric">
+        <div class="time-nome away">${j.b}</div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function onInput(num, lado, val) {
+  const v = val === '' ? null : parseInt(val);
+  if (!palpites[num]) palpites[num] = { a: null, b: null };
+  palpites[num][lado] = (v !== null && !isNaN(v)) ? v : null;
+  // estilo visual
+  const inp = document.getElementById(`g${lado}-${num}`);
+  inp.classList.toggle('filled', palpites[num][lado] !== null);
+  updateProgress();
+}
+
+// Conta apenas jogos confirmados (não tbd)
+const jogosConfirmados = JOGOS.filter(j => !j.tbd);
+
+function updateProgress() {
+  const nome = document.getElementById('nome').value.trim();
+  let preenchidos = 0;
+  jogosConfirmados.forEach(j => {
+    const p = palpites[j.num];
+    if (p && p.a !== null && p.b !== null) preenchidos++;
+  });
+  const total = jogosConfirmados.length;
+  const pct = Math.round((preenchidos / total) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-lbl').textContent = `${preenchidos} de ${total} jogos confirmados preenchidos`;
+  const ok = nome.length >= 2 && preenchidos === total;
+  document.getElementById('btn-submit').disabled = !ok;
+}
+
+// Atualiza também ao digitar nome
+document.addEventListener('DOMContentLoaded', () => {
+  renderJogos();
+  document.getElementById('nome').addEventListener('input', updateProgress);
+  checkDeadline();
+  setInterval(checkDeadline, 1000);
+});
+
+// ════════════════════════════════════════════════
+// DEADLINE COUNTDOWN
+// ════════════════════════════════════════════════
+function checkDeadline() {
+  const now = new Date();
+  const diff = DEADLINE - now;
+  if (diff <= 0) {
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('closed-screen').style.display = 'block';
+    document.getElementById('deadline-banner').style.display = 'none';
+    return;
+  }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('countdown').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// ════════════════════════════════════════════════
+// ENVIO PARA SUPABASE
+// ════════════════════════════════════════════════
+async function enviar() {
+  const btn = document.getElementById('btn-submit');
+  const msg = document.getElementById('msg');
+  const nome = document.getElementById('nome').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  msg.style.display = 'none';
+
+  // Monta array de palpites apenas dos jogos confirmados
+  const lista = jogosConfirmados.map(j => ({
+    num: j.num,
+    a: palpites[j.num]?.a ?? null,
+    b: palpites[j.num]?.b ?? null
+  }));
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/palpites_16avos`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ nome, palpites: lista })
+    });
+
+    if (res.ok || res.status === 201) {
+      msg.className = 'ok';
+      msg.innerHTML = `✅ <b>Palpites enviados com sucesso, ${nome}!</b><br>Acompanhe o ranking ao vivo pelo link do grupo. Boa sorte! 🏆`;
+      msg.style.display = 'block';
+      btn.textContent = '✅ Enviado!';
+      btn.style.background = '#22c55e';
+      // Desabilita todos os inputs
+      document.querySelectorAll('.gol-input').forEach(i => i.disabled = true);
+      document.getElementById('nome').disabled = true;
+    } else {
+      const err = await res.text();
+      throw new Error(err);
+    }
+  } catch(e) {
+    msg.className = 'err';
+    msg.innerHTML = `❌ <b>Erro ao enviar.</b> Verifique sua conexão e tente novamente.<br><small>${e.message}</small>`;
+    msg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Tentar novamente';
+  }
+}
+</script>
+</body>
+</html>
