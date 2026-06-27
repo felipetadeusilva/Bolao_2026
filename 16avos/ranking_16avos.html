@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking — Bolão 16 Avos 2026</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --card2: #161d2e;
+    --border: rgba(255,255,255,0.08);
+    --gold: #f5a623;
+    --gold2: #ffd700;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #60a5fa;
+    --r: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: 40px; }
+
+  header { background: linear-gradient(135deg, #0f1729 0%, #1a0a2e 100%); border-bottom: 1px solid rgba(245,166,35,0.2); padding: 18px 16px 14px; text-align: center; }
+  header h1 { font-size: 1.25rem; font-weight: 800; color: var(--gold2); }
+  header p { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+  .phase-badge { display: inline-block; background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3); color: var(--gold); font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 6px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 12px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 6px; margin: 12px 0 10px; }
+  .tab { flex: 1; padding: 9px 4px; font-size: 0.72rem; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--muted); cursor: pointer; text-align: center; transition: all .2s; }
+  .tab.on { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.4); color: var(--gold); }
+
+  .tc { display: none; }
+  .tc.on { display: block; }
+
+  /* LIVE SCOREBOARD */
+  .live-section { margin-bottom: 10px; }
+  .live-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .live-title { font-size: 0.7rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.07em; }
+  .live-upd { font-size: 0.62rem; color: var(--muted); }
+  .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 4px; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .live-game { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; margin-bottom: 6px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+  .live-game.active { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.04); }
+  .live-game.final { border-color: rgba(255,255,255,0.12); }
+  .lg-time-a { text-align: right; font-size: 0.82rem; font-weight: 600; }
+  .lg-time-b { text-align: left; font-size: 0.82rem; font-weight: 600; }
+  .lg-center { text-align: center; }
+  .lg-score { font-size: 1.1rem; font-weight: 800; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lg-status { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+  .lg-status.live { color: var(--green); font-weight: 700; }
+  .lg-meta { font-size: 0.63rem; color: var(--muted); text-align: center; margin-top: 3px; grid-column: 1/-1; }
+
+  /* RANKING */
+  .notice { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 10px; line-height: 1.5; }
+  .rc { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 11px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: border-color .15s; position: relative; overflow: hidden; }
+  .rc:hover { border-color: rgba(245,166,35,0.2); }
+  .rc.r1 { border-color: rgba(255,215,0,0.3); }
+  .rc.r2 { border-color: rgba(192,192,192,0.25); }
+  .rc.r3 { border-color: rgba(205,127,50,0.25); }
+  .medal { position: absolute; top: 0; right: 0; bottom: 0; width: 3px; }
+  .m1 { background: var(--gold2); }
+  .m2 { background: #c0c0c0; }
+  .m3 { background: #cd7f32; }
+  .rpos { font-size: 1rem; font-weight: 900; min-width: 32px; text-align: center; }
+  .rinfo { flex: 1; min-width: 0; }
+  .rname { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rbadges { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+  .mk { font-size: 0.58rem; padding: 2px 5px; border-radius: 6px; font-weight: 700; }
+  .mk10 { background: rgba(255,215,0,0.18); color: var(--gold); }
+  .mk6  { background: rgba(34,197,94,0.18); color: var(--green); }
+  .mk4  { background: rgba(251,191,36,0.18); color: #fbbf24; }
+  .mk1  { background: rgba(239,68,68,0.18); color: var(--red); }
+  .rpts { text-align: right; flex-shrink: 0; }
+  .rpn { font-size: 1.2rem; font-weight: 900; color: var(--gold); line-height: 1; }
+  .rpl { font-size: 0.58rem; color: var(--muted); }
+
+  /* FICHA */
+  .psel-wrap { margin-bottom: 10px; }
+  select.psel { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; font-size: 0.84rem; outline: none; }
+  .ficha-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+  .ficha-table th { background: var(--card2); color: var(--gold); padding: 7px 5px; text-align: center; position: sticky; top: 0; }
+  .ficha-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .ficha-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .rb { font-size: 0.62rem; padding: 2px 6px; border-radius: 8px; font-weight: 700; }
+  .b10{background:rgba(255,215,0,.2);color:var(--gold)} .b6{background:rgba(34,197,94,.2);color:var(--green)}
+  .b4{background:rgba(251,191,36,.2);color:#fbbf24} .b1{background:rgba(239,68,68,.2);color:var(--red)}
+  .b0{background:rgba(100,100,100,.15);color:var(--muted)}
+
+  /* JOGOS */
+  .jt { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+  .jt th { background: var(--card2); color: var(--gold); padding: 7px 5px; text-align: center; }
+  .jt td { padding: 7px 5px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .jt-live td { background: rgba(34,197,94,0.05); }
+  .tw { overflow-x: auto; border-radius: var(--r); }
+  .live-indicator { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 3px; animation: pulse 1.5s infinite; }
+
+  /* LOADING */
+  #loading { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.82rem; }
+  .spin { display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 Bolão do Ronaldão</h1>
+  <p>Copa do Mundo 2026</p>
+  <div class="phase-badge">⚔️ 16 Avos de Final</div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab on" onclick="sTab('rank',this)">🏆 Ranking</div>
+    <div class="tab" onclick="sTab('jogos',this)">📋 Jogos</div>
+    <div class="tab" onclick="sTab('ficha',this)">👤 Palpites</div>
+  </div>
+
+  <div id="loading"><div class="spin"></div><br>Carregando...</div>
+
+  <!-- RANKING -->
+  <div id="tab-rank" class="tc on" style="display:none">
+    <div class="live-section" id="live-section"></div>
+    <div id="notice" class="notice" style="display:none"></div>
+    <div id="rl"></div>
+  </div>
+
+  <!-- JOGOS -->
+  <div id="tab-jogos" class="tc">
+    <div class="live-section" id="live-section2"></div>
+    <div class="tw">
+      <table class="jt" id="jtbl">
+        <thead><tr><th>#</th><th>Data</th><th>Time A</th><th>Placar</th><th>Time B</th><th>Status</th></tr></thead>
+        <tbody id="jtbd"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FICHA -->
+  <div id="tab-ficha" class="tc">
+    <div class="psel-wrap"><select class="psel" id="psel" onchange="renderFicha()"></select></div>
+    <div id="fc"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// CONFIGURAÇÃO
+// ════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://ycwdtdsvwhdjqjthlkfx.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_qBK2kKwx4ea3JEeTQrUmgg_7vOoQx1S';
+
+// ESPN API endpoint — sem key, grátis
+const ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+
+// Polling: a cada 60s durante jogo ativo, a cada 5min fora
+let pollInterval = null;
+
+// ════════════════════════════════════════════════
+// JOGOS DA FASE (mesma lista do formulário)
+// ════════════════════════════════════════════════
+const JOGOS = [
+  { num:1,  data:'28/06', hora:'16h00', local:'Los Angeles',      a:'África do Sul', b:'Canadá'         },
+  { num:2,  data:'29/06', hora:'14h00', local:'Houston',          a:'Brasil',        b:'Japão'           },
+  { num:3,  data:'29/06', hora:'17h30', local:'Boston',           a:'Alemanha',      b:'A definir'       },
+  { num:4,  data:'29/06', hora:'22h00', local:'Monterrey',        a:'Holanda',       b:'Marrocos'        },
+  { num:5,  data:'30/06', hora:'14h00', local:'Dallas',           a:'Costa do Marfim', b:'Noruega'       },
+  { num:6,  data:'30/06', hora:'18h00', local:'Nova York/NJ',     a:'França',        b:'A definir'       },
+  { num:7,  data:'30/06', hora:'22h00', local:'Cidade do México', a:'México',        b:'A definir'       },
+  { num:8,  data:'01/07', hora:'13h00', local:'Atlanta',          a:'A definir',     b:'A definir'       },
+  { num:9,  data:'01/07', hora:'17h00', local:'Seattle',          a:'A definir',     b:'A definir'       },
+  { num:10, data:'01/07', hora:'21h00', local:'Santa Clara',      a:'Estados Unidos',b:'Bósnia'          },
+  { num:11, data:'01/07', hora:'22h00', local:'Filadélfia',       a:'Espanha',       b:'A definir'       },
+  { num:12, data:'02/07', hora:'14h00', local:'Miami',            a:'Argentina',     b:'A definir'       },
+  { num:13, data:'02/07', hora:'22h30', local:'Kansas City',      a:'A definir',     b:'A definir'       },
+  { num:14, data:'03/07', hora:'00h00', local:'Vancouver',        a:'Suíça',         b:'A definir'       },
+  { num:15, data:'03/07', hora:'15h00', local:'Dallas',           a:'Austrália',     b:'A definir'       },
+  { num:16, data:'03/07', hora:'19h00', local:'Miami',            a:'A definir',     b:'A definir'       },
+];
+
+// Mapeamento nomes ESPN → nomes do bolão
+const ESPN_MAP = {
+  'South Africa':'África do Sul','Canada':'Canadá','Brazil':'Brasil','Japan':'Japão',
+  'Germany':'Alemanha','Netherlands':'Holanda','Morocco':'Marrocos',
+  "Ivory Coast":"Costa do Marfim","Cote d'Ivoire":"Costa do Marfim","Côte d'Ivoire":"Costa do Marfim",
+  'Norway':'Noruega','France':'França','Mexico':'México','United States':'Estados Unidos',
+  'Bosnia and Herzegovina':'Bósnia','Bosnia-Herzegovina':'Bósnia','Spain':'Espanha',
+  'Argentina':'Argentina','Switzerland':'Suíça','Australia':'Austrália',
+  'Colombia':'Colômbia','Portugal':'Portugal','Belgium':'Bélgica','Ecuador':'Equador',
+  'Sweden':'Suécia','Senegal':'Senegal','Ghana':'Gana','England':'Inglaterra',
+  'Croatia':'Croácia','Uzbekistan':'Uzbequistão','Congo DR':'Rep. D. Congo',
+  'Algeria':'Argélia','Austria':'Áustria','Jordan':'Jordânia',
+  'Saudi Arabia':'Arábia Saudita','Cape Verde':'Cabo Verde','Egypt':'Egito',
+  'Tunisia':'Tunísia','Uruguay':'Uruguai','Paraguay':'Paraguai','South Korea':'Rep. Coréia',
+};
+
+// Estado global
+let RESULTADOS = {}; // num -> {a, b, status, clock, period}
+let PART = [];
+let lastUpdate = null;
+let hasActiveGame = false;
+
+// ════════════════════════════════════════════════
+// PONTUAÇÃO (mesmas regras da fase 1)
+// ════════════════════════════════════════════════
+function pts(pa, pb, ra, rb) {
+  if (ra == null || rb == null || pa == null || pb == null) return null;
+  if (pa === ra && pb === rb) return 10;
+  const lp = pa > pb ? 'A' : pb > pa ? 'B' : 'E';
+  const lr = ra > rb ? 'A' : rb > ra ? 'B' : 'E';
+  const ok = lp === lr;
+  if (ok && (pa === ra || pb === rb || (lp === 'E' && lr === 'E'))) return 6;
+  if (ok) return 4;
+  if (pa === ra || pb === rb) return 1;
+  return 0;
+}
+
+function calcP(p) {
+  let tot=0, p10=0, p6=0, p4=0, p1=0;
+  p.palpites.forEach(pl => {
+    const r = RESULTADOS[pl.num];
+    if (!r || r.a == null) return;
+    const v = pts(pl.a, pl.b, r.a, r.b);
+    if (v === null) return;
+    tot += v;
+    if (v===10) p10++; else if(v===6) p6++; else if(v===4) p4++; else if(v===1) p1++;
+  });
+  return { tot, p10, p6, p4, p1 };
+}
+
+// ════════════════════════════════════════════════
+// ESPN API — busca placares
+// ════════════════════════════════════════════════
+async function fetchESPN() {
+  try {
+    // Busca jogos de hoje e dos próximos dias relevantes
+    const dates = getRelevantDates();
+    const res = await fetch(`${ESPN_URL}?dates=${dates}&limit=50`);
+    if (!res.ok) return;
+    const data = await res.json();
+    parseESPN(data);
+  } catch(e) {
+    console.warn('ESPN fetch error:', e);
+  }
+}
+
+function getRelevantDates() {
+  // Retorna data atual e próximos 2 dias no formato YYYYMMDD
+  const now = new Date();
+  const fmt = d => d.toISOString().slice(0,10).replace(/-/g,'');
+  const d1 = new Date(now); d1.setDate(d1.getDate()-1);
+  const d2 = new Date(now); d2.setDate(d2.getDate()+1);
+  return fmt(d1) + '-' + fmt(d2);
+}
+
+function parseESPN(data) {
+  hasActiveGame = false;
+  const events = data.events || [];
+  events.forEach(ev => {
+    const comp = ev.competitions?.[0];
+    if (!comp) return;
+    const home = comp.competitors?.find(c => c.homeAway === 'home');
+    const away = comp.competitors?.find(c => c.homeAway === 'away');
+    if (!home || !away) return;
+
+    const homeNome = ESPN_MAP[home.team?.displayName] || home.team?.displayName;
+    const awayNome = ESPN_MAP[away.team?.displayName] || away.team?.displayName;
+
+    // Encontra o jogo correspondente pelo nome dos times
+    const jogo = JOGOS.find(j =>
+      (normalize(j.a) === normalize(homeNome) && normalize(j.b) === normalize(awayNome)) ||
+      (normalize(j.a) === normalize(awayNome) && normalize(j.b) === normalize(homeNome))
+    );
+    if (!jogo) return;
+
+    const status = comp.status?.type;
+    const state = status?.state || 'pre'; // pre | in | post
+    const clock = comp.status?.displayClock || '0\'';
+    const period = comp.status?.period || 0;
+    const completed = status?.completed || false;
+
+    const scoreHome = state !== 'pre' ? parseInt(home.score) : null;
+    const scoreAway = state !== 'pre' ? parseInt(away.score) : null;
+
+    // Detecta se os times estão na ordem certa
+    const isHomeA = normalize(j.a) === normalize(homeNome);
+    const ra = isHomeA ? scoreHome : scoreAway;
+    const rb = isHomeA ? scoreAway : scoreHome;
+
+    RESULTADOS[jogo.num] = {
+      a: ra, b: rb,
+      status: state,
+      clock,
+      period,
+      completed,
+      statusTxt: status?.shortDetail || '',
+      homeNome, awayNome,
+      homeScore: scoreHome,
+      awayScore: scoreAway,
+    };
+
+    if (state === 'in') hasActiveGame = true;
+  });
+
+  lastUpdate = new Date();
+  ajustarPolling();
+}
+
+function normalize(s) {
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function ajustarPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  const intervalo = hasActiveGame ? 60000 : 300000; // 60s ao vivo, 5min fora
+  pollInterval = setInterval(fetchAll, intervalo);
+}
+
+// ════════════════════════════════════════════════
+// SUPABASE — busca palpites
+// ════════════════════════════════════════════════
+async function fetchPalpites() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/palpites_16avos?select=nome,palpites,criado_em&order=criado_em.asc`, {
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` }
+  });
+  if (!res.ok) throw new Error('Erro ao buscar palpites');
+  const rows = await res.json();
+
+  // Deduplica: mantém o último envio de cada nome
+  const map = {};
+  rows.forEach(r => { map[r.nome] = r; });
+  PART = Object.values(map).map(r => ({ nome: r.nome, palpites: r.palpites || [] }));
+}
+
+// ════════════════════════════════════════════════
+// RENDER LIVE SCOREBOARD
+// ════════════════════════════════════════════════
+function renderLive(containerId) {
+  const ativos = JOGOS.filter(j => {
+    const r = RESULTADOS[j.num];
+    return r && (r.status === 'in' || r.completed);
+  });
+  if (!ativos.length) { document.getElementById(containerId).innerHTML = ''; return; }
+
+  const upd = lastUpdate ? lastUpdate.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--';
+  let html = `<div class="live-header">
+    <span class="live-title">${hasActiveGame?'<span class="live-dot"></span>Ao vivo':'Últimos resultados'}</span>
+    <span class="live-upd">atualizado ${upd}</span>
+  </div>`;
+
+  ativos.forEach(j => {
+    const r = RESULTADOS[j.num];
+    const isLive = r.status === 'in';
+    const cls = isLive ? 'active' : 'final';
+    const scoreA = r.a != null ? r.a : '-';
+    const scoreB = r.b != null ? r.b : '-';
+    const statusLbl = isLive ? `<span class="lg-status live">⚽ ${r.clock}</span>` : `<span class="lg-status">Final</span>`;
+    html += `<div class="live-game ${cls}">
+      <div class="lg-time-a">${j.a}</div>
+      <div class="lg-center"><div class="lg-score">${scoreA} × ${scoreB}</div>${statusLbl}</div>
+      <div class="lg-time-b">${j.b}</div>
+      <div class="lg-meta">${j.local} · Jogo ${j.num}</div>
+    </div>`;
+  });
+
+  document.getElementById(containerId).innerHTML = html;
+}
+
+// ════════════════════════════════════════════════
+// RENDER RANKING
+// ════════════════════════════════════════════════
+function renderRanking() {
+  const jogosComResult = Object.keys(RESULTADOS).filter(k => RESULTADOS[k].a != null).length;
+  const total = JOGOS.length;
+
+  let noticeHtml = '';
+  if (jogosComResult === 0) {
+    noticeHtml = `⏳ Aguardando início dos jogos. <strong>${PART.length} participantes</strong> inscritos.`;
+  } else {
+    const liveCount = Object.values(RESULTADOS).filter(r => r.status === 'in').length;
+    noticeHtml = `${hasActiveGame ? '🔴 ' : ''}${liveCount > 0 ? liveCount + ' jogo(s) ao vivo · ' : ''}📊 <strong>${jogosComResult}</strong> de <strong>${total}</strong> jogos com resultado · <strong>${PART.length} participantes</strong>`;
+  }
+  const n = document.getElementById('notice');
+  n.innerHTML = noticeHtml;
+  n.style.display = 'block';
+
+  const scores = PART.map(p => ({ nome: p.nome, ...calcP(p) }));
+  scores.sort((a,b) => {
+    if (b.tot !== a.tot) return b.tot - a.tot;
+    if (b.p10 !== a.p10) return b.p10 - a.p10;
+    if (b.p6 !== a.p6) return b.p6 - a.p6;
+    if (b.p4 !== a.p4) return b.p4 - a.p4;
+    return b.p1 - a.p1;
+  });
+
+  const ranked = [];
+  let pos = 1;
+  scores.forEach((s,i) => {
+    if (i > 0) {
+      const prev = scores[i-1];
+      if (!(prev.tot===s.tot && prev.p10===s.p10 && prev.p6===s.p6 && prev.p4===s.p4 && prev.p1===s.p1)) pos = i+1;
+    }
+    ranked.push({ ...s, pos });
+  });
+
+  const medals = ['🥇','🥈','🥉'];
+  const mColors = {1:'var(--gold2)',2:'#c0c0c0',3:'#cd7f32'};
+
+  document.getElementById('rl').innerHTML = ranked.map(r => {
+    const p = r.pos;
+    const medal = p<=3 ? medals[p-1] : `${p}º`;
+    const mbar = p<=3 ? `<div class="medal m${p}"></div>` : '';
+    const col = mColors[p] || 'var(--muted)';
+    return `<div class="rc ${p<=3?'r'+p:''}" onclick="goFicha('${r.nome.replace(/'/g,"\\'")}')">
+      ${mbar}
+      <div class="rpos" style="color:${col}">${medal}</div>
+      <div class="rinfo">
+        <div class="rname">${r.nome}</div>
+        <div class="rbadges">
+          <span class="mk mk10">🏆 ${r.p10}</span>
+          <span class="mk mk6">✅ ${r.p6}</span>
+          <span class="mk mk4">🎯 ${r.p4}</span>
+          <span class="mk mk1">⚡ ${r.p1}</span>
+        </div>
+      </div>
+      <div class="rpts"><div class="rpn">${r.tot}</div><div class="rpl">pts</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// RENDER TABELA DE JOGOS
+// ════════════════════════════════════════════════
+function renderJogos() {
+  document.getElementById('jtbd').innerHTML = JOGOS.map(j => {
+    const r = RESULTADOS[j.num];
+    const isLive = r?.status === 'in';
+    const isFinal = r?.completed;
+    const placar = r?.a != null ? `${r.a} × ${r.b}` : '— × —';
+    const statusLbl = isLive ? `<span class="live-indicator"></span>${r.clock}` : (isFinal ? 'Final' : j.hora);
+    return `<tr class="${isLive?'jt-live':''}">
+      <td style="color:var(--muted)">${j.num}</td>
+      <td style="color:var(--muted);white-space:nowrap">${j.data}</td>
+      <td style="text-align:right;font-size:.78rem">${j.a}</td>
+      <td style="font-weight:700;color:${isLive?'var(--green)':isFinal?'var(--gold)':'var(--muted)'}">${placar}</td>
+      <td style="text-align:left;font-size:.78rem">${j.b}</td>
+      <td style="font-size:.63rem;color:${isLive?'var(--green)':'var(--muted)'}">${statusLbl}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// RENDER FICHA PARTICIPANTE
+// ════════════════════════════════════════════════
+function goFicha(nome) {
+  const idx = PART.findIndex(p => p.nome === nome);
+  if (idx < 0) return;
+  document.getElementById('psel').value = idx;
+  sTab('ficha', document.querySelectorAll('.tab')[2]);
+  renderFicha();
+}
+
+function renderFicha() {
+  const idx = parseInt(document.getElementById('psel').value);
+  const p = PART[idx];
+  if (!p) return;
+  const { tot, p10, p6, p4, p1 } = calcP(p);
+
+  const rows = p.palpites.map(pl => {
+    const j = JOGOS.find(g => g.num === pl.num);
+    if (!j) return '';
+    const r = RESULTADOS[pl.num];
+    const v = r?.a != null ? pts(pl.a, pl.b, r.a, r.b) : null;
+    const placarR = r?.a != null ? `${r.a}×${r.b}` : '—';
+    const placarP = `${pl.a}×${pl.b}`;
+    let bc = 'b0', vs = v != null ? String(v) : '—';
+    if (v===10) bc='b10'; else if(v===6) bc='b6'; else if(v===4) bc='b4'; else if(v===1) bc='b1';
+    const isLive = r?.status === 'in';
+    return `<tr style="${isLive?'background:rgba(34,197,94,0.04)':''}">
+      <td>${pl.num}</td>
+      <td style="text-align:right;font-size:.7rem">${j.a}</td>
+      <td style="color:var(--muted)">${placarP}</td>
+      <td style="color:${r?.a!=null?'var(--gold)':'var(--muted)'}">${placarR}${isLive?'<span class="live-indicator" style="margin-left:3px"></span>':''}</td>
+      <td style="text-align:left;font-size:.7rem">${j.b}</td>
+      <td><span class="rb ${bc}">${vs}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('fc').innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:.85rem;font-weight:700">${p.nome}</div>
+      <div style="font-size:1.3rem;font-weight:900;color:var(--gold)">${tot} <span style="font-size:.65rem;color:var(--muted);font-weight:400">pts</span></div>
+    </div>
+    <div class="tw"><table class="ficha-table">
+      <thead><tr><th>#</th><th>Time A</th><th>Palpite</th><th>Resultado</th><th>Time B</th><th>Pts</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ════════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════════
+function sTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tc').forEach(t => { t.classList.remove('on'); t.style.display = 'none'; });
+  el.classList.add('on');
+  const panel = document.getElementById('tab-' + id);
+  panel.classList.add('on');
+  panel.style.display = 'block';
+}
+
+// ════════════════════════════════════════════════
+// INICIALIZAÇÃO
+// ════════════════════════════════════════════════
+async function fetchAll() {
+  await Promise.all([fetchESPN(), fetchPalpites()]);
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('tab-rank').style.display = 'block';
+
+  renderLive('live-section');
+  renderLive('live-section2');
+  renderRanking();
+  renderJogos();
+
+  // Popular select da ficha
+  document.getElementById('psel').innerHTML = PART.map((p,i) => `<option value="${i}">${p.nome}</option>`).join('');
+  if (PART.length) renderFicha();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAll();
+  // Polling inicial: 2min, ajustado depois conforme status do jogo
+  pollInterval = setInterval(fetchAll, 120000);
+});
+</script>
+</body>
+</html>
